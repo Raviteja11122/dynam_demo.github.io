@@ -44,6 +44,8 @@
                 // });
                 scanner.regionMaskStrokeStyle = "#1891F6";
                 scanner.regionMaskLineWidth = 4;
+                await scanner.setVideoFit("cover");
+                scanner.ifSaveLastUsedCamera = true;
                 let scanSettings = await scanner.getScanSettings();
                 scanSettings.whenToPlaySoundforSuccessfulRead = "frame";
                 scanSettings.autoZoom = true;
@@ -57,9 +59,9 @@
                 settings = await scanner.getRuntimeSettings();
                 settings.region = {
                     regionLeft: 5,
-                    regionTop: 30,
+                    regionTop: 20,
                     regionRight: 95,
-                    regionBottom: 70,
+                    regionBottom: 80,
                     regionMeasuredByPercentage: true
                 };
                 await scanner.updateRuntimeSettings(settings);
@@ -87,12 +89,14 @@
             } catch (ex) {
                 let errMsg;
                 if (ex.message.includes("network connection error")) {
-                    errMsg = "Failed to connect to Dynamsoft License Server: network connection error. Check your Internet connection or contact Dynamsoft Support (support@dynamsoft.com) to acquire an offline license.";
-                } else {
+                    errMsg = "No internet connection available";
+                } else if(ex.message.includes("Permission denied")){
+                    errMsg = "Please grant camera permission.";
+                }else {
                     errMsg = ex.message||ex;
                 }
-                console.error(errMsg);
                 alert(errMsg);
+                console.error(errMsg);
             }
 
 

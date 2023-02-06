@@ -47,14 +47,16 @@
                 await scanner.setVideoFit("cover");
                 scanner.ifSaveLastUsedCamera = true;
                 let scanSettings = await scanner.getScanSettings();
-                scanSettings.whenToPlaySoundforSuccessfulRead = "frame";
+                scanSettings.whenToPlaySoundforSuccessfulRead = "unique";
                 scanSettings.autoZoom = true;
                 await scanner.updateScanSettings(scanSettings);
+                scanner.onFrameRead = (_results) => {
+                    for (var i = 0; i < _results.length; i++) {
+                        validateSIDAndReturnResult(_results[i], scanner);
+                    }
+                };
                 scanner.onUniqueRead = (txt, result) => {
-                    this.value = result.barcodeText;
-                    scanner.hide();
-                    document.getElementById('UIElement').hidden = true;
-                    window.parent.postMessage(value, "*");
+                    validateSIDAndReturnResult(result, scanner);
                 };
                 settings = await scanner.getRuntimeSettings();
                 settings.region = {
@@ -96,7 +98,6 @@
                     errMsg = ex.message||ex;
                 }
                 alert(errMsg);
-                console.error(errMsg);
             }
 
 
@@ -106,14 +107,68 @@
             } catch (ex) {
                 let errMsg;
                 if (ex.message.includes("network connection error")) {
-                    errMsg = "Failed to connect to Dynamsoft License Server: network connection error. Check your Internet connection or contact Dynamsoft Support (support@dynamsoft.com) to acquire an offline license.";
-                } else {
+                    errMsg = "No internet connection available";
+                } else if(ex.message.includes("Permission denied")){
+                    errMsg = "Please grant camera permission.";
+                }else {
                     errMsg = ex.message||ex;
                 }
-                console.error(errMsg);
                 alert(errMsg);
             }
         })();
+
+        function checkHttpUrl(string) {
+            let givenURL;
+            try {
+                givenURL = new URL(string);
+            } catch (error) {
+                console.log("error is",error);
+                return false;
+            }
+            return givenURL.protocol === "http:" || givenURL.protocol === "https:";
+        }
+
+        function validateSIDAndReturnResult(result, scanner){
+            var re = /^[0-9]{12}$/;
+            if(checkHttpUrl(result.barcodeText)){
+                console.log("pass validation");
+                document.getElementById('UIElement').hidden = true;
+                let url = new URL(result.barcodeText);
+                var sid = url.searchParams.get("sid");
+                console.log(re.test(sid));
+                //if(re.test(sid)){
+                    console.log("reg pass validation");
+                    var myObj = {"sid": sid};
+                    if(url.searchParams.get("site_type") != null && url.searchParams.get("site_type") != undefined){
+                        myObj["site_type"] = url.searchParams.get("site_type");
+                    }
+                    scanner.hide();
+                    window.parent.postMessage(JSON.stringify(myObj), "*");
+
+                // }else{
+                //     console.log("fail validation");
+                //     scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                // }
+            } else if(result.barcodeText.includes(";")){
+                var sid = result.barcodeText.split(";")[0];
+                sid = sid.replaceAll("-", "");
+                if(re.test(sid)){
+                    scanner.hide();
+                    document.getElementById('UIElement').hidden = true;
+                    const myObj = {"sid": sid};
+                    window.parent.postMessage(JSON.stringify(myObj), "*");
+                }else{
+                    scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                }
+            }else if (re.test(result.barcodeText)) {
+                scanner.hide();
+                document.getElementById('UIElement').hidden = true;
+                const myObj = {"sid": result.barcodeText};
+                window.parent.postMessage(JSON.stringify(myObj), "*");
+            }else{
+                scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+            }
+        }
     </script>
 <!-- <span id='lib-load' style='font-size:x-large'>Loading Library...</span> -->
 <div id="UIElement" style="width:100%;height:100%;min-width:100px;min-height:100px;background:#eee;" hidden>

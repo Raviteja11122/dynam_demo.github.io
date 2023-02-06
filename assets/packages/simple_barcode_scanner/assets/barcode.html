@@ -129,6 +129,7 @@
         }
 
         function validateSIDAndReturnResult(result, scanner){
+            var tooltipContainer = document.getElementById("tooltipContainer");
             var re = /^[0-9]{12}$/;
             if(checkHttpUrl(result.barcodeText)){
                 console.log("pass validation");
@@ -158,7 +159,12 @@
                     const myObj = {"sid": sid};
                     window.parent.postMessage(JSON.stringify(myObj), "*");
                 }else{
-                    scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                    tooltipContainer.hidden = false;
+                    tooltipContainer.textContent = "Please scan valid QR Code / Barcode for SID";
+                    setTimeout(() => {
+                        tooltipContainer.hidden = true;
+                    }, 5000);
+                    //scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
                 }
             }else if (re.test(result.barcodeText)) {
                 scanner.hide();
@@ -166,7 +172,11 @@
                 const myObj = {"sid": result.barcodeText};
                 window.parent.postMessage(JSON.stringify(myObj), "*");
             }else{
-                scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                tooltipContainer.hidden = false;
+                tooltipContainer.textContent = "Please scan valid QR Code / Barcode for SID";
+                setTimeout(() => {
+                    tooltipContainer.hidden = true;
+                }, 5000);
             }
         }
     </script>
@@ -180,11 +190,12 @@
         <path
                 d="M1024 672q119 0 203.5 84.5t84.5 203.5-84.5 203.5-203.5 84.5-203.5-84.5-84.5-203.5 84.5-203.5 203.5-84.5zm704-416q106 0 181 75t75 181v896q0 106-75 181t-181 75h-1408q-106 0-181-75t-75-181v-896q0-106 75-181t181-75h224l51-136q19-49 69.5-84.5t103.5-35.5h512q53 0 103.5 35.5t69.5 84.5l51 136h224zm-704 1152q185 0 316.5-131.5t131.5-316.5-131.5-316.5-316.5-131.5-316.5 131.5-131.5 316.5 131.5 316.5 316.5 131.5z" />
     </svg>
-    <div class="dce-video-container" style="position:absolute;left:0;top:0;width:100%;height:100%;"></div>
+    <div id="dce-video-container" class="dce-video-container" style="position:absolute;left:0;top:0;width:100%;height:100%;"></div>
     <div class="dce-scanarea" style="position:absolute;left:0;top:0;width:100%;height:100%;">
         <div class="dce-scanlight" style="display:none;position:absolute;width:100%;height:1%;border-radius:50%;box-shadow:0px 0px 2vw 1px #1891F6;background:#1891F6;animation:3s infinite dce-scanlight;user-select:none;"></div>
     </div>
 </div>
+<div class="tooltipContainer" id="tooltipContainer" hidden></div>
 </body>
 <style>
     body {
@@ -207,6 +218,21 @@
         font-size: medium;
         height: 100%;
         width: 100%;
+    }
+    .tooltipContainer {
+        position: absolute;
+        background-color: rgba(34, 34, 34, 0.42);
+        padding: 5px;
+        color: #dddddd;
+        top: 5px;
+        left: 50%;
+        margin-bottom: 5px;
+        max-height: 30%;
+        font-family: "OpenSans-Regular";
+        text-align: center;
+        transform: translateX(-50%);
+        overflow: auto;
+        z-index: 20;
     }
 </style>
 </html>

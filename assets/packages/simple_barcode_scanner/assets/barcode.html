@@ -122,12 +122,12 @@
             var urlRegEx = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
             this.value = result.barcodeText;
             this.value = this.value.replaceAll("-", "");
-            console.log(this.value);
-            console.log(urlRegEx.test(this.value));
-            if(urlRegEx.test(this.value)){
+            console.log(result.barcodeText);
+            console.log(urlRegEx.test(result.barcodeText));
+            if(urlRegEx.test(result.barcodeText)){
                 console.log("pass validation");
                 document.getElementById('UIElement').hidden = true;
-                let url = new URL(this.value);
+                let url = new URL(result.barcodeText);
                 var sid = url.searchParams.get("sid");
                 console.log(re.test(sid));
                 if(re.test(sid)){

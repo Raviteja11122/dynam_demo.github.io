@@ -30,25 +30,12 @@
         (async function() {
             try {
                 let scanner = await (pScanner = pScanner || Dynamsoft.DBR.BarcodeScanner.createInstance());
-                const cameras = await scanner.getAllCameras();
-                console.log(cameras);
-                // cameras.forEach(async camera => {
-                //     if (camera.deviceId === e.target.id) {
-                //         try {
-                //             await scanner.setCurrentCamera(camera);
-                //         } catch (ex) {
-                //             alert('Play video failed: ' + (ex.message || ex));
-                //         }
-
-                //     }
-                // });
                 scanner.regionMaskStrokeStyle = "#1891F6";
                 scanner.regionMaskLineWidth = 4;
                 await scanner.setVideoFit("cover");
-                scanner.ifSaveLastUsedCamera = true;
                 let scanSettings = await scanner.getScanSettings();
                 scanSettings.whenToPlaySoundforSuccessfulRead = "unique";
-                scanSettings.autoZoom = true;
+                //scanSettings.autoZoom = true;
                 await scanner.updateScanSettings(scanSettings);
                 scanner.onFrameRead = (_results) => {
                     for (var i = 0; i < _results.length; i++) {
@@ -75,7 +62,6 @@
                         height: {
                             ideal: 1080
                         },
-                        //aspectRatio: 1.777778,
                         facingMode: {
                             ideal: "environment"
                         }
@@ -97,6 +83,7 @@
                 }else {
                     errMsg = ex.message||ex;
                 }
+                console.error(ex);
                 alert(errMsg);
             }
 
@@ -113,6 +100,7 @@
                 }else {
                     errMsg = ex.message||ex;
                 }
+                console.error(ex);
                 alert(errMsg);
             }
         })();

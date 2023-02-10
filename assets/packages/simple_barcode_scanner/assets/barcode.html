@@ -125,7 +125,7 @@
                 let url = new URL(result.barcodeText);
                 var sid = url.searchParams.get("sid");
                 console.log(re.test(sid));
-                //if(re.test(sid)){
+                if(re.test(sid)){
                     console.log("reg pass validation");
                     var myObj = {"sid": sid};
                     if(url.searchParams.get("site_type") != null && url.searchParams.get("site_type") != undefined){
@@ -134,10 +134,10 @@
                     scanner.hide();
                     window.parent.postMessage(JSON.stringify(myObj), "*");
 
-                // }else{
-                //     console.log("fail validation");
-                //     scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
-                // }
+                }else{
+                    console.log("fail validation");
+                    scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                }
             } else if(result.barcodeText.includes(";")){
                 var sid = result.barcodeText.split(";")[0];
                 sid = sid.replaceAll("-", "");

@@ -119,10 +119,13 @@
         function validateSIDAndReturnResult(result, scanner){
             var tooltipContainer = document.getElementById("tooltipContainer");
             var re = /^[0-9]{12}$/;
-            if(checkHttpUrl(result.barcodeText)){
+            var urlRegEx = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+            this.value = result.barcodeText;
+            this.value = this.value.replaceAll("-", "");
+            if(urlRegEx.test(this.value)){
                 console.log("pass validation");
                 document.getElementById('UIElement').hidden = true;
-                let url = new URL(result.barcodeText);
+                let url = new URL(this.value);
                 var sid = url.searchParams.get("sid");
                 console.log(re.test(sid));
                 if(re.test(sid)){
@@ -136,11 +139,14 @@
 
                 }else{
                     console.log("fail validation");
-                    scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
+                    tooltipContainer.hidden = false;
+                    tooltipContainer.textContent = "Please scan valid QR Code / Barcode for SID";
+                    setTimeout(() => {
+                        tooltipContainer.hidden = true;
+                    }, 5000);
                 }
-            } else if(result.barcodeText.includes(";")){
-                var sid = result.barcodeText.split(";")[0];
-                sid = sid.replaceAll("-", "");
+            } else if(this.value.includes(";")){
+                var sid = this.value.split(";")[0];
                 if(re.test(sid)){
                     scanner.hide();
                     document.getElementById('UIElement').hidden = true;
@@ -152,12 +158,11 @@
                     setTimeout(() => {
                         tooltipContainer.hidden = true;
                     }, 5000);
-                    //scanner.showTip(0, 0, 1000, "Please scan valid QR Code / Barcode for SID", 5000, true);
                 }
-            }else if (re.test(result.barcodeText)) {
+            }else if (re.test(this.value)) {
                 scanner.hide();
                 document.getElementById('UIElement').hidden = true;
-                const myObj = {"sid": result.barcodeText};
+                const myObj = {"sid": this.value};
                 window.parent.postMessage(JSON.stringify(myObj), "*");
             }else{
                 tooltipContainer.hidden = false;

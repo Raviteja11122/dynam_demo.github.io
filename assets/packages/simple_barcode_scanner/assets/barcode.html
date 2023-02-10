@@ -122,6 +122,7 @@
             var urlRegEx = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
             this.value = result.barcodeText;
             this.value = this.value.replaceAll("-", "");
+            console.log(urlRegEx.test(this.value));
             if(urlRegEx.test(this.value)){
                 console.log("pass validation");
                 document.getElementById('UIElement').hidden = true;

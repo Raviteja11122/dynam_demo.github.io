@@ -120,14 +120,15 @@
             var tooltipContainer = document.getElementById("tooltipContainer");
             var re = /^[0-9]{12}$/;
             var urlRegEx = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
-            this.value = result.barcodeText;
+            
+            this.value = "https://facebook.com?sid=12345678910&site_type=0";
             this.value = this.value.replaceAll("-", "");
-            console.log("scan value" + result.barcodeText);
-            console.log("reg ex test," + urlRegEx.test(result.barcodeText));
-            if(urlRegEx.test(result.barcodeText)){
+            console.log("scan value" + this.value);
+            console.log("reg ex test," + urlRegEx.test("https://facebook.com?sid=12345678910&site_type=0"));
+            if(urlRegEx.test("https://facebook.com?sid=12345678910&site_type=0")){
                 console.log("pass validation");
                 document.getElementById('UIElement').hidden = true;
-                let url = new URL(result.barcodeText);
+                let url = new URL("https://facebook.com?sid=12345678910&site_type=0");
                 var sid = url.searchParams.get("sid");
                 console.log(re.test(sid));
                 if(re.test(sid)){
